@@ -1,7 +1,0 @@
-<div class="fs-container">
-  <app-login
-    *ngIf="!showLobby"
-    (enterLobbyEvent)="enterLobby($event)"
-  ></app-login>
-  <app-chat-room *ngIf="showLobby" [userName]="userName"></app-chat-room>
-</div>
