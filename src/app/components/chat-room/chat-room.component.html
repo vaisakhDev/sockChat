@@ -1,0 +1,19 @@
+<h2 class="header">Lobby 🛋️</h2>
+<div class="chat-holder">
+  <div class="msg-container" *ngFor="let message of messages">
+    <div
+      [ngClass]="{
+        'msg-self': message.fromSelf,
+        msg: message.type === 'message',
+        notification: message.type === 'notification'
+      }"
+    >
+      <div class="username-holder">{{ message.fromUserName }}</div>
+      <div class="message-text-holder">{{ message.text }}</div>
+    </div>
+  </div>
+</div>
+<form>
+  <input type="text" placeholder="Enter Message" [(ngModel)]="msg" name="msg" />
+  <button (click)="sendMessage($event)">Send</button>
+</form>

@@ -1,0 +1,17 @@
+form {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+button {
+  flex-grow: 1;
+}
+
+input {
+  flex-grow: 2;
+}
+
+h2 {
+  color: #4a4a4a;
+}

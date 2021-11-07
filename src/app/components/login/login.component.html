@@ -1,0 +1,14 @@
+<div>
+  <h1>Welcome to Sock Chat 🧦</h1>
+  <h2>A simple socket.io based chat app</h2>
+  <p>Just choose a nick name and enter the lobby to chat</p>
+  <form>
+    <input
+      type="text"
+      [(ngModel)]="userName"
+      name="userName"
+      placeholder="John Doe"
+    />
+    <button (click)="enterLobby()">Enter Lobby</button>
+  </form>
+</div>

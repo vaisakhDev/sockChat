@@ -1,0 +1,21 @@
+.fs-container {
+  display: flex;
+  height: 100vh;
+  max-width: 500px;
+  margin: auto;
+  flex-direction: column;
+}
+
+app-login {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+app-chat-room {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+}
