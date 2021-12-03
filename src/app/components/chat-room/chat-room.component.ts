@@ -8,6 +8,7 @@ import { ChatService } from 'src/app/services/chat.service';
 })
 export class ChatRoomComponent implements OnInit {
   @Input() userName: string;
+  @Input() channel: any;
   public msg = '';
   public messages: Array<{
     text: string;
@@ -19,6 +20,8 @@ export class ChatRoomComponent implements OnInit {
   constructor(private chatService: ChatService) {}
 
   ngOnInit(): void {
+    console.log(this.channel);
+
     this.chatService.getMessage().subscribe((data) => {
       const message = (<{ message: string }>data).message;
       this.messages.push({
@@ -38,10 +41,11 @@ export class ChatRoomComponent implements OnInit {
     e.preventDefault();
     console.log(this.msg);
 
-    this.chatService.sendMessage({
-      message: this.msg,
-      fromUserName: this.userName,
-    });
+    // this.chatService.sendMessage({
+    //   message: this.msg,
+    //   fromUserName: this.userName,
+    // });
+    this.channel.send(this.msg);
     this.messages.push({ text: this.msg, fromSelf: true, type: 'message' });
     this.msg = '';
   }

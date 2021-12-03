@@ -1,0 +1,9 @@
+<div>
+  <input type="text" [(ngModel)]="msg" />
+  <button (click)="sendMsg()">Send Msg</button>
+  <button (click)="callRemote()">Call Remote</button>
+  <!-- <app-logs [logs]="logs"></app-logs> -->
+  <ul>
+    <li *ngFor="let log of logs">{{ log.msg }}</li>
+  </ul>
+</div>
