@@ -31,8 +31,6 @@ export class ChatService {
   }
 
   public sendICE(msg: any) {
-    console.log(msg);
-    console.log(JSON.stringify(msg));
     this.socket.emit('icecandidate', JSON.stringify(msg));
   }
 

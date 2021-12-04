@@ -21,7 +21,11 @@ export class MainComponent implements OnInit {
   configuration: RTCConfiguration = {
     iceServers: [
       {
-        urls: ['stun:stun.services.mozilla.com'],
+        urls: [
+          'stun:stun.services.mozilla.com',
+          'stun:stun1.l.google.com:19302',
+          'stun:stun2.l.google.com:19302',
+        ],
       },
     ],
     iceCandidatePoolSize: 10,
@@ -30,6 +34,7 @@ export class MainComponent implements OnInit {
   public channel: RTCDataChannel;
   public logs: Array<{ msg: string; id: number }> = [];
   public msg = '';
+  public gatheredCandidates: Array<RTCIceCandidate> = [];
 
   constructor(
     private chatService: ChatService,
@@ -46,18 +51,36 @@ export class MainComponent implements OnInit {
     // Listen for local ICE candidates on the local RTCPeerConnection
     this.connection.addEventListener('icecandidate', (event) => {
       if (event.candidate) {
+        console.log(this.gatheredCandidates);
+        this.gatheredCandidates.push(event.candidate);
+      }
+      if (event.candidate && event.candidate.candidate) {
+        console.log('Remote sdp', this.connection.remoteDescription);
+        console.log('local sdp', this.connection.localDescription);
         this.addLog('Sending ice candidate to remote...');
+        console.log('ICE send', event.candidate);
         this.chatService.sendICE(event.candidate);
       }
     });
     // Listen for connectionstatechange on the local RTCPeerConnection
     this.connection.addEventListener('connectionstatechange', (event) => {
-      this.addLog('Connection state changed...');
+      this.addLog(
+        `Connection state changed : ${this.connection.connectionState}`
+      );
 
       if (this.connection.connectionState === 'connected') {
         this.addLog('Peers connected');
       }
     });
+
+    this.connection.oniceconnectionstatechange = () =>
+      this.addLog(
+        `Ice connection state change: ${this.connection.iceConnectionState}`
+      );
+    this.connection.onicegatheringstatechange = (e) =>
+      this.addLog(
+        `Ice gathering state change: ${this.connection.iceGatheringState}`
+      );
 
     this.connection.ondatachannel = (event) => {
       console.log('Data channel is created!');
@@ -93,13 +116,16 @@ export class MainComponent implements OnInit {
     });
 
     this.chatService.getICE().subscribe((message) => {
+      console.log('ICE rcv: ', message);
+
       this.addLog('Receiving ice candidate from caller...');
+
       this.connection.addIceCandidate(message);
     });
   }
 
   private addLog(msg: string) {
-    console.log('adding', msg);
+    console.log(msg);
 
     // this.logs = [
     //   ...this.logs,
