@@ -57,7 +57,11 @@ export class MainComponent implements OnInit {
       if (event.candidate && event.candidate.candidate) {
         console.log('Remote sdp', this.connection.remoteDescription);
         console.log('local sdp', this.connection.localDescription);
-        this.addLog('Sending ice candidate to remote...');
+        this.addLog(
+          `Sending ice candidate to remote : ${JSON.stringify(
+            event.candidate.candidate
+          )}`
+        );
         console.log('ICE send', event.candidate);
         this.chatService.sendICE(event.candidate);
       }
@@ -118,9 +122,14 @@ export class MainComponent implements OnInit {
     this.chatService.getICE().subscribe((message) => {
       console.log('ICE rcv: ', message);
 
-      this.addLog('Receiving ice candidate from caller...');
-
-      this.connection.addIceCandidate(message);
+      this.addLog(
+        `Receiving ice candidate from caller: ${JSON.stringify(
+          message.candidate
+        )}`
+      );
+      if (message && message.candidate) {
+        this.connection.addIceCandidate(message);
+      }
     });
   }
 
