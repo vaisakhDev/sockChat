@@ -4,4 +4,11 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent {}
+export class AppComponent {
+  public isPolite = false;
+  public showChat = false;
+
+  public start() {
+    this.showChat = true;
+  }
+}

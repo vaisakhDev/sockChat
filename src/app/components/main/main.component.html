@@ -1,9 +1,12 @@
 <div>
+  <!-- <app-logs [logs]="logs"></app-logs> -->
+  <div id="chat-window" style="max-height: 100px; overflow: scroll">
+    <div *ngFor="let log of logs">
+      <span> {{ gettimeStamp() }}</span>
+      {{ log.msg }}
+    </div>
+  </div>
   <input type="text" [(ngModel)]="msg" />
   <button (click)="sendMsg()">Send Msg</button>
   <button (click)="callRemote()">Call Remote</button>
-  <!-- <app-logs [logs]="logs"></app-logs> -->
-  <ul>
-    <li *ngFor="let log of logs">{{ log.msg }}</li>
-  </ul>
 </div>

@@ -7,10 +7,15 @@ import { map } from 'rxjs/operators';
 })
 export class ChatService {
   public socketSubject: Subject<string>;
+  public isPolite = false;
   constructor(private socket: Socket) {
     this.socketSubject = new Subject();
     this.socket.on('connect', () => {
       this.socketSubject.next(this.socket.ioSocket.id);
+      this.socket.on('info', (msg: any) => {
+        console.log(msg);
+        this.isPolite = true;
+      });
     });
   }
 
@@ -18,12 +23,19 @@ export class ChatService {
     this.socket.emit('message', JSON.stringify(msg));
   }
 
-  public sendOfffer(offer: any) {
-    this.socket.emit('offer', JSON.stringify({ offer: offer }));
-  }
+  // public sendOfffer(offer: any) {
+  //   this.socket.emit('offer', JSON.stringify({ offer: offer }));
+  // }
 
-  public sendAnswer(answer: any) {
-    this.socket.emit('answer', JSON.stringify({ answer: answer }));
+  // public sendAnswer(answer: any) {
+  //   this.socket.emit('answer', JSON.stringify({ answer: answer }));
+  // }
+
+  public sendDescription(description: any) {
+    this.socket.emit(
+      'description',
+      JSON.stringify({ description: description })
+    );
   }
 
   public sendNotification(msg: string) {
@@ -38,14 +50,20 @@ export class ChatService {
     return this.socket.fromEvent('notification');
   }
 
-  public getOffer(): Observable<any> {
+  // public getOffer(): Observable<any> {
+  //   return this.socket
+  //     .fromEvent('offer')
+  //     .pipe(map((data) => JSON.parse(<string>data)));
+  // }
+  // public getAnswer(): Observable<any> {
+  //   return this.socket
+  //     .fromEvent('answer')
+  //     .pipe(map((data) => JSON.parse(<string>data)));
+  // }
+
+  public getDescription(): Observable<any> {
     return this.socket
-      .fromEvent('offer')
-      .pipe(map((data) => JSON.parse(<string>data)));
-  }
-  public getAnswer(): Observable<any> {
-    return this.socket
-      .fromEvent('answer')
+      .fromEvent('description')
       .pipe(map((data) => JSON.parse(<string>data)));
   }
 
