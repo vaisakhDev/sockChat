@@ -1,12 +1,16 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ElementRef,
   Input,
   OnInit,
+  ViewChild,
 } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
 import adapter from 'webrtc-adapter';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-main',
@@ -14,10 +18,11 @@ import adapter from 'webrtc-adapter';
   styleUrls: ['./main.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MainComponent implements OnInit {
+export class MainComponent implements OnInit, AfterViewInit {
   // The polite peer uses rollback to avoid collision with an incoming offer.
   // The impolite peer ignores an incoming offer when this would collide with its own.
   @Input() isPolitePeer: boolean;
+  @ViewChild('textBox') textBox!: ElementRef;
   public socketId: string = '';
   public userName: string = '';
   public showLobby = false;
@@ -35,49 +40,53 @@ export class MainComponent implements OnInit {
   };
   public connection: RTCPeerConnection;
   public channel: RTCDataChannel;
-  public logs: Array<{ msg: string; id: number }> = [];
+  public logs: Array<{
+    msg: string;
+    id: number;
+    timestamp: string;
+    fromRemote: boolean;
+  }> = [];
   public msg = '';
-  public gatheredCandidates: Array<RTCIceCandidate> = [];
 
   // keep track of some negotiation state to prevent races and errors
   private makingOffer = false;
   private ignoreOffer = false;
+  public localMediaStream: MediaStream;
+  public remoteStream: MediaStream;
 
   constructor(
     private chatService: ChatService,
     private ref: ChangeDetectorRef
   ) {}
 
+  ngAfterViewInit(): void {
+    this.focusTextBox();
+  }
+
   ngOnInit(): void {
-    console.log(adapter.browserDetails.browser);
+    this.addLog(`Browser : ${adapter.browserDetails.browser}`);
     this.chatService.socketSubject.subscribe(
       (socketId) => (this.socketId = socketId)
     );
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((mediaStrem) => {
-        for (const track of mediaStrem.getTracks()) {
-          this.connection.addTrack(track);
+
+    this.connection = new RTCPeerConnection(this.configuration);
+    window.navigator.mediaDevices
+      .getUserMedia({ video: true, audio: false })
+      .then((mediaStream) => {
+        this.localMediaStream = mediaStream;
+        for (const track of mediaStream.getTracks()) {
+          this.connection.addTrack(track, mediaStream);
         }
       });
 
-    this.connection = new RTCPeerConnection(this.configuration);
-
     // Listen for local ICE candidates on the local RTCPeerConnection
     this.connection.addEventListener('icecandidate', ({ candidate }) => {
-      if (candidate) {
-        console.log(this.gatheredCandidates);
-        this.gatheredCandidates.push(candidate);
-      }
       if (candidate && candidate.candidate) {
-        console.log('Remote sdp', this.connection.remoteDescription);
-        console.log('local sdp', this.connection.localDescription);
         this.addLog(
           `Sending ice candidate to remote : ${JSON.stringify(
             candidate.candidate
           )}`
         );
-        console.log('ICE send', candidate);
         this.chatService.sendICE(candidate);
       }
     });
@@ -87,7 +96,7 @@ export class MainComponent implements OnInit {
       try {
         this.createDataChannel();
         this.makingOffer = true;
-        console.log('Sending ofer');
+        this.addLog('Sending ofer');
         const offerDescription = await this.connection.createOffer();
         await this.connection.setLocalDescription(offerDescription);
         this.chatService.sendDescription(this.connection.localDescription);
@@ -137,10 +146,10 @@ export class MainComponent implements OnInit {
       );
 
     this.connection.ondatachannel = (event) => {
-      console.log('Data channel is created!');
+      this.addLog('Data channel is created!');
       this.channel = event.channel;
       this.channel.onopen = () => {
-        console.log('Data channel is open and ready to be used.');
+        this.addLog('Data channel is open and ready to be used.');
       };
 
       this.channel.onmessage = (msg) =>
@@ -177,31 +186,7 @@ export class MainComponent implements OnInit {
       }
     });
 
-    // this.chatService.getOffer().subscribe(async (message) => {
-    //   this.addLog(
-    //     'Recevived offer from caller...setting remote session description'
-    //   );
-    //   this.connection.setRemoteDescription(
-    //     new RTCSessionDescription(message.offer)
-    //   );
-    //   this.addLog(
-    //     'Setting local session description...sending answer to caller'
-    //   );
-    //   const answer = await this.connection.createAnswer();
-    //   await this.connection.setLocalDescription(answer);
-    //   this.chatService.sendAnswer(answer);
-    // });
-
-    // this.chatService.getAnswer().subscribe(async (message) => {
-    //   this.addLog('Received answer from remote...');
-    //   this.addLog('Setting remote session description...');
-    //   const remoteDesc = new RTCSessionDescription(message.answer);
-    //   await this.connection.setRemoteDescription(remoteDesc);
-    // });
-
     this.chatService.getICE().subscribe((message) => {
-      console.log('ICE rcv: ', message);
-
       this.addLog(
         `Receiving ice candidate from caller: ${JSON.stringify(
           message.candidate
@@ -211,13 +196,19 @@ export class MainComponent implements OnInit {
         this.connection.addIceCandidate(message);
       }
     });
+
+    this.connection.ontrack = ({ streams }) => {
+      this.remoteStream = streams[0];
+    };
   }
 
-  private addLog(msg: string) {
+  private addLog(msg: string, isMessageFromRemotePeer = false) {
     const logs = [...this.logs];
     logs.push({
       id: this.logs.length,
       msg: msg,
+      timestamp: this.gettimeStamp(),
+      fromRemote: isMessageFromRemotePeer,
     });
     this.logs = [...logs];
     this.ref.detectChanges();
@@ -229,8 +220,7 @@ export class MainComponent implements OnInit {
   }
 
   private handleDataChannelMessageReceived(msg: any) {
-    console.log(msg.data);
-    this.addLog(`Remote : ${msg.data}`);
+    this.addLog(`Remote : ${msg.data}`, true);
   }
 
   private createDataChannel() {
@@ -261,12 +251,17 @@ export class MainComponent implements OnInit {
   public async callRemote() {
     //this._initConnection();
   }
-  public sendMsg() {
-    this.channel.send(this.msg);
-    this.addLog(`You : ${this.msg}`);
+  public sendMsg(form: NgForm) {
+    this.channel.send(form.value.message);
+    this.addLog(`You : ${form.value.message}`);
+    form.control.get('message')?.reset();
   }
 
   public gettimeStamp(): string {
     return new Date().toISOString();
+  }
+
+  public focusTextBox() {
+    this.textBox.nativeElement.focus();
   }
 }

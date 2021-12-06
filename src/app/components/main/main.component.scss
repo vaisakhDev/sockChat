@@ -1,0 +1,22 @@
+.blue-text {
+  color: blue;
+}
+
+#input {
+  position: relative;
+  caret-color: transparent;
+}
+/* Puts a blinking square after the content as replacement for caret */
+#input[contenteditable="true"]:after {
+  content: "■";
+  animation: cursor 1s infinite;
+  animation-timing-function: step-end;
+  margin-left: 1px;
+}
+/* Inserts the > before terminal input */
+#input:before {
+  content: ">";
+  position: absolute;
+  padding-left: 1.5rem;
+  left: 0;
+}

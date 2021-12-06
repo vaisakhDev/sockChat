@@ -1,12 +1,27 @@
-<div>
-  <!-- <app-logs [logs]="logs"></app-logs> -->
-  <div id="chat-window" style="max-height: 100px; overflow: scroll">
-    <div *ngFor="let log of logs">
-      <span> {{ gettimeStamp() }}</span>
-      {{ log.msg }}
+<div style="height: 100vh; display: flex" (click)="focusTextBox()">
+  <div>
+    <!-- <app-logs [logs]="logs"></app-logs> -->
+    <div id="chat-window" style="height: 80%; overflow: auto">
+      <div *ngFor="let log of logs">
+        <span style="color: grey"> {{ log.timestamp }}&nbsp;</span>
+        <span [ngClass]="{ 'blue-text': log.fromRemote }">{{ log.msg }}</span>
+      </div>
     </div>
+    <form #f="ngForm" style="height: 20%" (ngSubmit)="sendMsg(f)" novalidate>
+      <input
+        type="text"
+        name="message"
+        ngModel
+        required
+        #textBox
+        autocomplete="off"
+      />
+      <button type="submit">Send Msg</button>
+    </form>
   </div>
-  <input type="text" [(ngModel)]="msg" />
-  <button (click)="sendMsg()">Send Msg</button>
-  <button (click)="callRemote()">Call Remote</button>
+  <app-audio-video
+    [localStream]="localMediaStream"
+    [remoteStream]="remoteStream"
+    *ngIf="localMediaStream && remoteStream"
+  ></app-audio-video>
 </div>

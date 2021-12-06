@@ -10,7 +10,9 @@
   ></app-chat-room>
 </div> -->
 
-<button *ngIf="!showChat" (click)="start()">Start Chat</button>
-<input type="checkbox" name="polite" [(ngModel)]="isPolite" />
-<label for="polite"></label>
+<div *ngIf="!showChat">
+  <button (click)="start()">Start Chat</button>
+  <input type="checkbox" name="polite" id="polite" [(ngModel)]="isPolite" />
+  <label for="polite">Is Polite Peer</label>
+</div>
 <app-main *ngIf="showChat" [isPolitePeer]="isPolite"></app-main>
