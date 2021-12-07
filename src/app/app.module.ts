@@ -9,6 +9,7 @@ import { ChatRoomComponent } from './components/chat-room/chat-room.component';
 import { LogsComponent } from './components/logs/logs.component';
 import { MainComponent } from './components/main/main.component';
 import { AudioVideoComponent } from './components/audio-video/audio-video.component';
+import { AudioVisualizerComponent } from './components/audio-visualizer/audio-visualizer.component';
 
 const socketConfig: SocketIoConfig = {
   url: 'https://sock-chat-api.herokuapp.com',
@@ -24,6 +25,7 @@ const socketConfig: SocketIoConfig = {
     LogsComponent,
     MainComponent,
     AudioVideoComponent,
+    AudioVisualizerComponent,
   ],
   imports: [BrowserModule, SocketIoModule.forRoot(socketConfig), FormsModule],
   providers: [],
