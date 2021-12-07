@@ -1,8 +1,29 @@
-video {
+.video-container {
+  position: relative;
   width: 240px;
-  height: 240px;
+  height: 100%;
 }
 
-.video-container {
+.overlay {
   display: flex;
+  // background: linear-gradient(90deg, #00f 50%, transparent 50.1%);
+  mix-blend-mode: overlay;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 9999999;
+}
+.overlay-bg-1 {
+  background: url("./../../../assets/tv_noise_gif.gif") no-repeat center center;
+  opacity: 10%;
+  background-size: cover;
+}
+
+.overlay-bg-2 {
+  background: url("./../../../assets/video-glitch-overlay.gif") no-repeat center
+    center;
+  opacity: 40%;
+  background-size: cover;
 }

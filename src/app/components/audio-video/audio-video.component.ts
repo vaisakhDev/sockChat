@@ -13,27 +13,18 @@ import {
   styleUrls: ['./audio-video.component.scss'],
 })
 export class AudioVideoComponent implements OnInit, AfterViewInit {
-  @Input() localStream: MediaStream;
-  @Input() remoteStream: MediaStream;
-  @ViewChild('localStream') localStreamEl!: ElementRef;
-  @ViewChild('remoteStream') remoteStreamEl!: ElementRef;
+  @Input() mediaStream: MediaStream;
+  @Input() title: string;
+  @ViewChild('videoEl') videoEl!: ElementRef;
 
   constructor() {}
 
   ngOnInit(): void {}
 
   ngAfterViewInit(): void {
-    if (this.localStreamEl && this.localStream) {
-      console.log(this.localStream);
-
-      (this.localStreamEl.nativeElement as HTMLVideoElement).srcObject =
-        this.localStream;
-    }
-    if (this.remoteStreamEl && this.remoteStream) {
-      console.log('Remote Stream', this.remoteStream);
-
-      (this.remoteStreamEl.nativeElement as HTMLVideoElement).srcObject =
-        this.remoteStream;
+    if (this.mediaStream) {
+      (this.videoEl.nativeElement as HTMLVideoElement).srcObject =
+        this.mediaStream;
     }
   }
 }

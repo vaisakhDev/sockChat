@@ -1,5 +1,5 @@
 <div style="height: 100vh; display: flex" (click)="focusTextBox()">
-  <div style="flex-basis: 1">
+  <div style="flex: 1">
     <!-- <app-logs [logs]="logs"></app-logs> -->
     <div id="chat-window" style="height: 80%; overflow: auto">
       <div *ngFor="let log of logs">
@@ -23,13 +23,16 @@
       <button type="submit">Send Msg</button>
     </form>
   </div>
-  <app-audio-video
-    [localStream]="localMediaStream"
-    [remoteStream]="remoteStream"
-    *ngIf="localMediaStream && remoteStream"
-  ></app-audio-video>
-  <app-audio-visualizer
-    [mediaStream]="localMediaStream"
-    *ngIf="localMediaStream"
-  ></app-audio-visualizer>
+  <div style="display: flex; flex-direction: column; flex: 1; gap: 2rem">
+    <app-audio-video
+      title="Incoming video feed"
+      [mediaStream]="remoteStream"
+      *ngIf="remoteStream"
+    ></app-audio-video>
+    <app-audio-visualizer
+      [mediaStream]="remoteStream"
+      *ngIf="remoteStream"
+      title="Incoming Audio Stream"
+    ></app-audio-visualizer>
+  </div>
 </div>

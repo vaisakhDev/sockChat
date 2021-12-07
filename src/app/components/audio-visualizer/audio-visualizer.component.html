@@ -1,1 +1,4 @@
-<canvas #canvas [height]="canvasHeight" [width]="canvasWidth"></canvas>
+<div class="border" #canvasWrapper style="width: 95%">
+  <div class="title-bar">{{ title }}</div>
+  <canvas #canvas style="width: 100%" height="canvasHeight"></canvas>
+</div>

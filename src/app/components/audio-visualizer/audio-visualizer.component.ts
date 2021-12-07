@@ -6,6 +6,7 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
+import { WindowResizeService } from 'src/app/services/window-resize.service';
 
 @Component({
   selector: 'app-audio-visualizer',
@@ -14,55 +15,111 @@ import {
 })
 export class AudioVisualizerComponent implements OnInit, AfterViewInit {
   @Input() mediaStream: MediaStream;
+  @Input() title: string;
   @ViewChild('canvas') canvas: ElementRef;
+  @ViewChild('canvasWrapper') canvasWrapper: ElementRef;
   analyser: AnalyserNode;
   frequencyData: Uint8Array;
   ctx: CanvasRenderingContext2D | null;
-  canvasWidth = 500;
-  canvasHeight = 500;
+  // canvasWidth = 240;
+  // canvasHeight = 240;
+  dataArray: Uint8Array;
+  canvasElement: HTMLCanvasElement;
 
-  constructor() {}
+  constructor(private windowResizeService: WindowResizeService) {}
 
   ngAfterViewInit(): void {
     this.ctx = (this.canvas.nativeElement as HTMLCanvasElement).getContext(
       '2d'
     );
+
+    this.canvasElement = this.canvas.nativeElement as HTMLCanvasElement;
   }
 
   ngOnInit(): void {
+    // this.windowResizeService.onWindowResize.subscribe((e) =>
+    //   this.computeCanvasDimensions(e)
+    // );
     const audioCtx = new window.AudioContext();
     const src = audioCtx.createMediaStreamSource(this.mediaStream);
 
     this.analyser = audioCtx.createAnalyser();
-    this.analyser.fftSize = 64;
+    this.analyser.fftSize = 2048;
     src.connect(this.analyser);
     this.analyser.connect(audioCtx.destination);
     this.frequencyData = new Uint8Array(this.analyser.frequencyBinCount);
-    this.loopingFunction();
+    this.dataArray = new Uint8Array(this.analyser.fftSize);
+    this.analyser.getByteTimeDomainData(this.dataArray);
+    this.drawWaveForm();
+    // this.loopingFunction();
     // setInterval(() => {
     //   this.analyser.getByteFrequencyData(this.frequencyData);
     //   console.log(this.frequencyData);
     // }, 10);
   }
-  loopingFunction() {
-    requestAnimationFrame(() => this.loopingFunction());
-    this.analyser.getByteFrequencyData(this.frequencyData);
-    this.draw(this.frequencyData);
-  }
 
-  public draw(frequencyData: Uint8Array) {
-    const data = [...frequencyData];
-    if (this.ctx) {
-      this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-      let space = this.canvasWidth / data.length;
-      data.forEach((value, i) => {
-        if (this.ctx) {
-          this.ctx.beginPath();
-          this.ctx.moveTo(space * i, this.canvasHeight); //x,y
-          this.ctx.lineTo(space * i, this.canvasHeight - value); //x,y
-          this.ctx.stroke();
-        }
-      });
+  // loopingFunction() {
+  //   requestAnimationFrame(() => this.loopingFunction());
+  //   this.analyser.getByteFrequencyData(this.frequencyData);
+  //   this.draw(this.frequencyData);
+  // }
+
+  // public draw(frequencyData: Uint8Array) {
+  //   const data = [...frequencyData];
+  //   if (this.ctx) {
+  //     this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+  //     let space = this.canvasWidth / data.length;
+  //     data.forEach((value, i) => {
+  //       if (this.ctx) {
+  //         this.ctx.beginPath();
+  //         this.ctx.moveTo(space * i, this.canvasHeight); //x,y
+  //         this.ctx.lineTo(space * i, this.canvasHeight - value); //x,y
+  //         this.ctx.stroke();
+  //       }
+  //     });
+  //   }
+  // }
+
+  // private computeCanvasDimensions(ev: any) {
+  //   if (this.canvasWrapper && this.canvasWrapper.nativeElement) {
+  //     this.ctx?.clearRect(0, 0, 1000, 1000);
+  //     const canvasEl = this.canvasWrapper.nativeElement as HTMLCanvasElement;
+  //     console.log(canvasEl.clientWidth, canvasEl.clientHeight);
+  //     // this.canvasWidth = canvasEl.clientWidth;
+  //     // this.canvasHeight = canvasEl.clientHeight;
+  //   }
+  // }
+
+  // draw an oscilloscope of the current audio source from waveform
+  public drawWaveForm() {
+    requestAnimationFrame(() => this.drawWaveForm());
+    this.analyser.getByteTimeDomainData(this.dataArray);
+    if (this.ctx && this.canvasElement) {
+      const width = this.canvasElement.width;
+      const height = this.canvasElement.height;
+      this.ctx.clearRect(0, 0, width, height);
+      this.ctx.fillStyle = '#282828';
+      this.ctx.fillRect(0, 0, width, height);
+
+      this.ctx.lineWidth = 2;
+      this.ctx.strokeStyle = '#33ff00';
+
+      const sliceWidth = (width * 1.0) / this.analyser.fftSize;
+      let x = 0;
+
+      this.ctx.beginPath();
+      for (var i = 0; i < this.analyser.fftSize; i++) {
+        const v = this.dataArray[i] / 128.0;
+        const y = (v * height) / 2;
+
+        if (i === 0) this.ctx.moveTo(x, y);
+        else this.ctx.lineTo(x, y);
+
+        x += sliceWidth;
+      }
+
+      this.ctx.lineTo(width, height / 2);
+      this.ctx.stroke();
     }
   }
 }

@@ -1,16 +1,9 @@
-<div class="video-container">
-  <video
-    autoplay
-    muted
-    class="remote-video"
-    id="remote-video"
-    #remoteStream
-  ></video>
-  <video
-    autoplay
-    muted
-    class="local-video"
-    id="local-video"
-    #localStream
-  ></video>
+<div style="width: 100%; display: flex; justify-content: center">
+  <div class="video-container border">
+    <div class="title-bar">{{ title }}</div>
+    <div class="overlay overlay-bg-1"></div>
+    <div class="overlay overlay-bg-2"></div>
+    <!-- <img src="./../../../assets/video-glitch-overlay.gif" alt="" /> -->
+    <video style="width: 100%; height: 100%" autoplay muted #videoEl></video>
+  </div>
 </div>
