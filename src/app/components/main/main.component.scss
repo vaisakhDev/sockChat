@@ -2,21 +2,22 @@
   color: blue;
 }
 
-#input {
-  position: relative;
-  caret-color: transparent;
+.type-indicator {
+  font-weight: bolder;
+  font-size: 1.5rem;
 }
-/* Puts a blinking square after the content as replacement for caret */
-#input[contenteditable="true"]:after {
-  content: "■";
-  animation: cursor 1s infinite;
-  animation-timing-function: step-end;
-  margin-left: 1px;
+
+.blink {
+  animation: blink-animation 1s steps(5, start) infinite;
+  -webkit-animation: blink-animation 1s steps(5, start) infinite;
 }
-/* Inserts the > before terminal input */
-#input:before {
-  content: ">";
-  position: absolute;
-  padding-left: 1.5rem;
-  left: 0;
+@keyframes blink-animation {
+  to {
+    visibility: hidden;
+  }
+}
+@-webkit-keyframes blink-animation {
+  to {
+    visibility: hidden;
+  }
 }

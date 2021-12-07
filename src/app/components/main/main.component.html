@@ -1,5 +1,5 @@
 <div style="height: 100vh; display: flex" (click)="focusTextBox()">
-  <div>
+  <div style="flex-basis: 1">
     <!-- <app-logs [logs]="logs"></app-logs> -->
     <div id="chat-window" style="height: 80%; overflow: auto">
       <div *ngFor="let log of logs">
@@ -8,14 +8,18 @@
       </div>
     </div>
     <form #f="ngForm" style="height: 20%" (ngSubmit)="sendMsg(f)" novalidate>
-      <input
-        type="text"
-        name="message"
-        ngModel
-        required
-        #textBox
-        autocomplete="off"
-      />
+      <div style="display: flex; align-items: center">
+        <div class="type-indicator blink">></div>
+        <input
+          style="width: 100%"
+          type="text"
+          name="message"
+          ngModel
+          required
+          #textBox
+          autocomplete="off"
+        />
+      </div>
       <button type="submit">Send Msg</button>
     </form>
   </div>
@@ -24,4 +28,8 @@
     [remoteStream]="remoteStream"
     *ngIf="localMediaStream && remoteStream"
   ></app-audio-video>
+  <app-audio-visualizer
+    [mediaStream]="localMediaStream"
+    *ngIf="localMediaStream"
+  ></app-audio-visualizer>
 </div>

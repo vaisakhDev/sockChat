@@ -71,7 +71,7 @@ export class MainComponent implements OnInit, AfterViewInit {
 
     this.connection = new RTCPeerConnection(this.configuration);
     window.navigator.mediaDevices
-      .getUserMedia({ video: true, audio: false })
+      .getUserMedia({ video: true, audio: true })
       .then((mediaStream) => {
         this.localMediaStream = mediaStream;
         for (const track of mediaStream.getTracks()) {
