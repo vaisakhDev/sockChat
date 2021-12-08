@@ -1,10 +1,9 @@
-<div style="height: 100vh; display: flex" (click)="focusTextBox()">
+<div (click)="focusTextBox()" style="display: flex; width: 100%; height: 100%">
   <div style="flex: 1">
-    <!-- <app-logs [logs]="logs"></app-logs> -->
     <div id="chat-window" style="height: 80%; overflow: auto">
       <div *ngFor="let log of logs">
-        <span style="color: grey"> {{ log.timestamp }}&nbsp;</span>
-        <span [ngClass]="{ 'blue-text': log.fromRemote }">{{ log.msg }}</span>
+        <span class="text-light"> {{ log.timestamp }}&nbsp;</span>
+        <span>{{ log.msg }}</span>
       </div>
     </div>
     <form #f="ngForm" style="height: 20%" (ngSubmit)="sendMsg(f)" novalidate>
@@ -19,8 +18,8 @@
           #textBox
           autocomplete="off"
         />
+        <button type="submit">Send Msg</button>
       </div>
-      <button type="submit">Send Msg</button>
     </form>
   </div>
   <div style="display: flex; flex-direction: column; flex: 1; gap: 2rem">

@@ -6,7 +6,6 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { WindowResizeService } from 'src/app/services/window-resize.service';
 
 @Component({
   selector: 'app-audio-visualizer',
@@ -21,12 +20,10 @@ export class AudioVisualizerComponent implements OnInit, AfterViewInit {
   analyser: AnalyserNode;
   frequencyData: Uint8Array;
   ctx: CanvasRenderingContext2D | null;
-  // canvasWidth = 240;
-  // canvasHeight = 240;
   dataArray: Uint8Array;
   canvasElement: HTMLCanvasElement;
 
-  constructor(private windowResizeService: WindowResizeService) {}
+  constructor() {}
 
   ngAfterViewInit(): void {
     this.ctx = (this.canvas.nativeElement as HTMLCanvasElement).getContext(
@@ -37,14 +34,12 @@ export class AudioVisualizerComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    // this.windowResizeService.onWindowResize.subscribe((e) =>
-    //   this.computeCanvasDimensions(e)
-    // );
     const audioCtx = new window.AudioContext();
     const src = audioCtx.createMediaStreamSource(this.mediaStream);
 
     this.analyser = audioCtx.createAnalyser();
-    this.analyser.fftSize = 2048;
+    // this.analyser.fftSize = 2048;
+    this.analyser.fftSize = 512;
     src.connect(this.analyser);
     this.analyser.connect(audioCtx.destination);
     this.frequencyData = new Uint8Array(this.analyser.frequencyBinCount);
@@ -98,7 +93,7 @@ export class AudioVisualizerComponent implements OnInit, AfterViewInit {
       const width = this.canvasElement.width;
       const height = this.canvasElement.height;
       this.ctx.clearRect(0, 0, width, height);
-      this.ctx.fillStyle = '#282828';
+      this.ctx.fillStyle = '#000f08';
       this.ctx.fillRect(0, 0, width, height);
 
       this.ctx.lineWidth = 2;
@@ -118,8 +113,20 @@ export class AudioVisualizerComponent implements OnInit, AfterViewInit {
         x += sliceWidth;
       }
 
+      // draw frequency visualization
+
       this.ctx.lineTo(width, height / 2);
       this.ctx.stroke();
+      this.analyser.getByteFrequencyData(this.frequencyData);
+
+      const freqData = [...this.frequencyData];
+      let space = width / freqData.length;
+      freqData.forEach((value, i) => {
+        this.ctx?.beginPath();
+        this.ctx?.moveTo(space * i, height); //x,y
+        this.ctx?.lineTo(space * i, width - value); //x,y
+        this.ctx?.stroke();
+      });
     }
   }
 }

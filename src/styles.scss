@@ -1,26 +1,30 @@
 @import url("https://fonts.googleapis.com/css?family=VT323&display=swap");
+// @import "variables";
 
 /* You can add global styles to this file, and also import other style files */
+$green: #5bf870;
+$light-green: #b4ffb4;
+$background: #000f08;
+
 body {
   margin: 0;
   padding: 0;
   font-family: "VT323", monospace;
-  text-transform: uppercase;
   font-size: 1.25rem;
-  background-color: #282828;
-  color: #33ff00;
+  background-color: $background;
+  color: $green;
+  text-shadow: 1px 1px 10px $green;
 }
 
 input[type="text"] {
-  color: #33ff00;
-  background-color: #282828;
+  color: $green;
+  background-color: $background;
   border: none;
   -webkit-appearance: none;
   -ms-appearance: none;
   -moz-appearance: none;
   appearance: none;
   padding: 12px;
-  text-transform: uppercase;
   margin-left: 0;
   padding-left: 0;
   &:focus,
@@ -31,20 +35,23 @@ input[type="text"] {
   &:before {
     content: ">";
   }
+  text-shadow: 1px 1px 10px $green;
+  font-weight: bold;
 }
 
 button {
-  background-color: #282828;
-  color: white;
+  background-color: $background;
+  color: $green;
   margin: 10px;
   padding: 5px;
+  border: 2px solid $green;
 }
 
 .border {
-  border: 2px solid green;
+  border: 2px solid $green;
 }
 
 .title-bar {
-  background-color: green;
+  background-color: $green;
   color: white;
 }

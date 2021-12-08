@@ -1,5 +1,9 @@
-.blue-text {
-  color: blue;
+$text-light: #b4ffb4;
+// TODO : use global varibales for colors
+$background: #000f08;
+
+.text-light {
+  color: $text-light;
 }
 
 .type-indicator {

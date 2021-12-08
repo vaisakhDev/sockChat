@@ -1,18 +1,11 @@
-<!-- <div class="fs-container">
-  <app-login
-    *ngIf="!showLobby"
-    (enterLobbyEvent)="enterLobby($event)"
-  ></app-login>
-  <app-chat-room
-    *ngIf="showLobby"
-    [userName]="userName"
-    [channel]="channel"
-  ></app-chat-room>
-</div> -->
-
-<div *ngIf="!showChat">
-  <button (click)="start()">Start Chat</button>
-  <input type="checkbox" name="polite" id="polite" [(ngModel)]="isPolite" />
-  <label for="polite">Is Polite Peer</label>
+<div
+  style="height: 100vh; width: 100vw; background-color: #000f08; color: #5bf870"
+  class="crt"
+>
+  <div *ngIf="!showChat">
+    <button (click)="start()">Start Chat</button>
+    <input type="checkbox" name="polite" id="polite" [(ngModel)]="isPolite" />
+    <label for="polite">Is Polite Peer</label>
+  </div>
+  <app-main *ngIf="showChat" [isPolitePeer]="isPolite"></app-main>
 </div>
-<app-main *ngIf="showChat" [isPolitePeer]="isPolite"></app-main>
